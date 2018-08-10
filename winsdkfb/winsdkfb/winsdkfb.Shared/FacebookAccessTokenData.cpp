@@ -136,9 +136,9 @@ FBAccessTokenData^ FBAccessTokenData::FromUri(
 {
     bool gotToken = false;
     bool gotExpiration = false;
-    bool gotBadField = false;
     String^ token;
     String^ expiration = nullptr;
+    String^ reauthorize = nullptr;
     FBAccessTokenData^ data = nullptr;
 
     WwwFormUrlDecoder^ decoder = FBAccessTokenData::ParametersFromResponse(
@@ -158,13 +158,13 @@ FBAccessTokenData^ FBAccessTokenData::FromUri(
             expiration = entry->Value;
             gotExpiration = true;
         }
-        else
+        else if ( entry->Name->Equals( L"reauthorize_required_in" ) )
         {
-            gotBadField = true;
+            reauthorize = entry->Value;
         }
     }
 
-    if (gotToken && gotExpiration && !gotBadField)
+    if ( gotToken && gotExpiration )
     {
         data = ref new FBAccessTokenData(token, expiration);
     }
